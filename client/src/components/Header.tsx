@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetHeader } from "@/components/ui/sheet";
-import { Menu, X, FileText } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+  SheetHeader,
+} from "@/components/ui/sheet";
+import { Menu, X, FileText, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -18,7 +25,10 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Global">
+      <nav
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+        aria-label="Global"
+      >
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex lg:flex-1">
@@ -40,9 +50,7 @@ export default function Header() {
                 href={item.href}
                 className={cn(
                   "text-sm font-semibold leading-6 transition-colors hover:text-blue-600",
-                  location === item.href
-                    ? "text-blue-600"
-                    : "text-gray-900"
+                  location === item.href ? "text-blue-600" : "text-gray-900",
                 )}
               >
                 {item.name}
@@ -53,7 +61,10 @@ export default function Header() {
           {/* CTA Button */}
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             <Link href="/">
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Button
+                size="sm"
+                className="group bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center space-x-2"
+              >
                 Try Now
               </Button>
             </Link>
@@ -100,7 +111,7 @@ export default function Header() {
                             "-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 transition-colors hover:bg-gray-50",
                             location === item.href
                               ? "text-blue-600 bg-blue-50"
-                              : "text-gray-900"
+                              : "text-gray-900",
                           )}
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -110,7 +121,7 @@ export default function Header() {
                     </div>
                     <div className="py-6">
                       <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                        <Button className="group bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-200 transition-all duration-200 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 flex items-center space-x-2">
                           Try Now
                         </Button>
                       </Link>
