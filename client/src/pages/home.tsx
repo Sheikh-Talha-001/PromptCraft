@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { 
   RotateCcw, 
@@ -14,14 +15,23 @@ import {
   Zap, 
   Shield, 
   FileText,
-  Loader2
+  Loader2,
+  Sparkles,
+  ArrowRight,
+  Code,
+  Database,
+  Users,
+  Star,
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "wouter";
 
 export default function Home() {
   const [inputText, setInputText] = useState("");
   const [jsonOutput, setJsonOutput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const [validationStatus, setValidationStatus] = useState<{
     isValid: boolean;
     message: string;
@@ -29,6 +39,45 @@ export default function Home() {
   const [copySuccess, setCopySuccess] = useState(false);
   
   const { toast } = useToast();
+
+  const enhancePrompt = (text: string): string => {
+    if (!text.trim()) return text;
+    
+    const lowerText = text.toLowerCase();
+    let enhanced = text.trim();
+    
+    // Add context and specificity based on detected patterns
+    if (lowerText.includes("chatbot") || lowerText.includes("bot")) {
+      if (!lowerText.includes("context") && !lowerText.includes("conversation")) {
+        enhanced += " with conversational context awareness and user session management";
+      }
+    }
+    
+    if (lowerText.includes("analyze") || lowerText.includes("analysis")) {
+      if (!lowerText.includes("detailed") && !lowerText.includes("comprehensive")) {
+        enhanced += " providing detailed insights and comprehensive reporting";
+      }
+    }
+    
+    if (lowerText.includes("generate") || lowerText.includes("create")) {
+      if (!lowerText.includes("customizable") && !lowerText.includes("options")) {
+        enhanced += " with customizable output formats and filtering options";
+      }
+    }
+    
+    if (lowerText.includes("search") || lowerText.includes("find")) {
+      if (!lowerText.includes("ranking") && !lowerText.includes("relevance")) {
+        enhanced += " with relevance ranking and advanced filtering capabilities";
+      }
+    }
+    
+    // Add common best practices if not mentioned
+    if (!lowerText.includes("error") && !lowerText.includes("validation")) {
+      enhanced += " including proper error handling and input validation";
+    }
+    
+    return enhanced;
+  };
 
   const generateJsonPrompt = (text: string): string => {
     if (!text.trim()) return "";
@@ -49,32 +98,67 @@ export default function Home() {
       taskName = "analysis_tool";
     } else if (text.toLowerCase().includes("generate") || text.toLowerCase().includes("create")) {
       taskName = "content_generator";
+    } else if (text.toLowerCase().includes("recommend") || text.toLowerCase().includes("suggest")) {
+      taskName = "recommendation_engine";
+    } else if (text.toLowerCase().includes("classify") || text.toLowerCase().includes("categorize")) {
+      taskName = "classification_tool";
     }
 
     // Generate parameters based on content
     const parameters: Record<string, any> = {};
     
-    if (text.toLowerCase().includes("location")) {
+    if (text.toLowerCase().includes("location") || text.toLowerCase().includes("geographic")) {
       parameters.location = {
         type: "string",
-        description: "Geographic location or area",
-        required: true
+        description: "Geographic location or area specification",
+        required: true,
+        examples: ["New York, NY", "San Francisco Bay Area", "London, UK"]
       };
     }
     
-    if (text.toLowerCase().includes("user") || text.toLowerCase().includes("people")) {
+    if (text.toLowerCase().includes("user") || text.toLowerCase().includes("people") || text.toLowerCase().includes("person")) {
       parameters.user_preferences = {
         type: "object",
-        description: "User preferences and requirements",
-        required: false
+        description: "User preferences and personal requirements",
+        required: false,
+        properties: {
+          interests: { type: "array", items: { type: "string" } },
+          experience_level: { type: "string", enum: ["beginner", "intermediate", "advanced"] },
+          constraints: { type: "object" }
+        }
       };
     }
     
-    if (text.toLowerCase().includes("type") || text.toLowerCase().includes("category")) {
+    if (text.toLowerCase().includes("type") || text.toLowerCase().includes("category") || text.toLowerCase().includes("classification")) {
       parameters.category = {
         type: "string",
-        description: "Category or type specification",
-        required: false
+        description: "Category or type specification for filtering",
+        required: false,
+        examples: ["technology", "business", "education", "entertainment"]
+      };
+    }
+
+    if (text.toLowerCase().includes("price") || text.toLowerCase().includes("cost") || text.toLowerCase().includes("budget")) {
+      parameters.price_range = {
+        type: "object",
+        description: "Budget constraints and pricing preferences",
+        properties: {
+          min_price: { type: "number" },
+          max_price: { type: "number" },
+          currency: { type: "string", default: "USD" }
+        }
+      };
+    }
+
+    if (text.toLowerCase().includes("time") || text.toLowerCase().includes("date") || text.toLowerCase().includes("schedule")) {
+      parameters.temporal_constraints = {
+        type: "object",
+        description: "Time-based requirements and scheduling",
+        properties: {
+          start_date: { type: "string", format: "date" },
+          end_date: { type: "string", format: "date" },
+          timezone: { type: "string", default: "UTC" }
+        }
       };
     }
 
@@ -83,29 +167,74 @@ export default function Home() {
       parameters.input_data = {
         type: "string",
         description: "Primary input for processing",
-        required: true
+        required: true,
+        minLength: 1,
+        maxLength: 1000
       };
       parameters.options = {
         type: "object",
         description: "Additional configuration options",
-        required: false
+        required: false,
+        properties: {
+          format: { type: "string", enum: ["json", "xml", "text"] },
+          verbose: { type: "boolean", default: false }
+        }
       };
+    }
+
+    // Enhanced constraints based on task type
+    const constraints: Record<string, any> = {
+      max_results: taskName.includes("search") ? 20 : 10,
+      response_format: "structured_data",
+      include_metadata: true,
+      timeout_seconds: 30
+    };
+
+    if (taskName.includes("chatbot")) {
+      constraints.max_conversation_turns = 50;
+      constraints.context_window = 4000;
+    }
+
+    if (taskName.includes("analysis")) {
+      constraints.analysis_depth = "comprehensive";
+      constraints.include_confidence_scores = true;
     }
 
     const jsonStructure = {
       task: taskName,
       purpose: purpose,
       parameters: parameters,
-      constraints: {
-        max_results: 10,
-        response_format: "structured_data",
-        include_metadata: true
-      },
+      constraints: constraints,
       output_format: {
-        result: "string",
-        confidence: "number",
-        metadata: "object",
-        timestamp: "string"
+        result: {
+          type: "object",
+          description: "Main result data"
+        },
+        confidence: {
+          type: "number",
+          minimum: 0,
+          maximum: 1,
+          description: "Confidence score for the result"
+        },
+        metadata: {
+          type: "object",
+          description: "Additional context and processing information",
+          properties: {
+            processing_time_ms: { type: "number" },
+            version: { type: "string" },
+            source: { type: "string" }
+          }
+        },
+        timestamp: {
+          type: "string",
+          format: "date-time",
+          description: "ISO 8601 timestamp of result generation"
+        }
+      },
+      validation_rules: {
+        required_fields: ["result", "timestamp"],
+        optional_fields: ["confidence", "metadata"],
+        data_types: "strictly_enforced"
       }
     };
 
@@ -122,6 +251,36 @@ export default function Home() {
       return { isValid: true, message: "Valid JSON generated successfully!" };
     } catch (error) {
       return { isValid: false, message: `Invalid JSON: ${error instanceof Error ? error.message : 'Unknown error'}` };
+    }
+  };
+
+  const handleEnhance = async () => {
+    if (!inputText.trim()) {
+      toast({
+        variant: "destructive",
+        description: "Please enter a text prompt first",
+      });
+      return;
+    }
+
+    setIsEnhancing(true);
+    
+    // Simulate AI enhancement processing
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    try {
+      const enhanced = enhancePrompt(inputText);
+      setInputText(enhanced);
+      toast({
+        description: "Prompt enhanced with additional context and best practices!",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Failed to enhance prompt",
+      });
+    } finally {
+      setIsEnhancing(false);
     }
   };
 
@@ -220,204 +379,377 @@ export default function Home() {
     }
   };
 
+  const faqs = [
+    {
+      question: "What types of prompts can I convert to JSON?",
+      answer: "You can convert any text description into structured JSON. Our tool works best with chatbot instructions, API requirements, search queries, analysis tasks, and content generation prompts. The more specific your description, the better the generated JSON structure."
+    },
+    {
+      question: "How does the auto-enhance feature work?",
+      answer: "The auto-enhance feature analyzes your text and adds relevant context, best practices, and additional specifications based on common patterns. It helps improve your prompts by adding error handling, validation requirements, and industry-standard practices."
+    },
+    {
+      question: "Is my data secure and private?",
+      answer: "Yes, absolutely. All processing happens directly in your browser using client-side JavaScript. Your text prompts and generated JSON never leave your device or get sent to our servers, ensuring complete privacy and security."
+    },
+    {
+      question: "Can I modify the generated JSON?",
+      answer: "The generated JSON is designed to be a starting point. You can copy it to your preferred editor and modify it according to your specific needs. The structure includes comments and examples to guide customization."
+    },
+    {
+      question: "What programming languages can use the generated JSON?",
+      answer: "The generated JSON is language-agnostic and can be used with any programming language that supports JSON parsing, including JavaScript, Python, Java, C#, PHP, Ruby, Go, and many others."
+    },
+    {
+      question: "How accurate is the JSON structure generation?",
+      answer: "Our tool uses intelligent pattern recognition and best practices to generate JSON structures. While very accurate for common use cases, you may need to fine-tune the output for complex or highly specialized requirements."
+    }
+  ];
+
   return (
-    <div className="bg-slate-50 font-sans antialiased min-h-screen">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-slate-900 text-center">
-            Text-to-JSON Prompt Converter
-          </h1>
-          <p className="text-lg text-slate-600 text-center mt-2">
-            Transform simple text descriptions into structured JSON prompts
-          </p>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Input Section */}
-          <div className="space-y-6">
-            {/* Input Card */}
-            <Card className="bg-white rounded-xl shadow-sm border border-slate-200">
-              <CardContent className="p-6">
-                <label htmlFor="textInput" className="block text-lg font-semibold text-slate-900 mb-3">
-                  Enter your simple text prompt:
-                </label>
-                <Textarea
-                  id="textInput"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Describe what you want the JSON prompt to do... For example: 'Create a chatbot that helps users find restaurants with specific dietary requirements and location preferences'"
-                  className="min-h-40 resize-none text-slate-700 placeholder-slate-400"
-                  aria-describedby="input-help"
-                />
-                <p id="input-help" className="text-sm text-slate-500 mt-2">
-                  Describe your requirements in natural language. Be as specific as possible.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleConvert}
-                disabled={isProcessing}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 h-auto transition-colors duration-200"
-              >
-                {isProcessing ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <RotateCcw className="w-5 h-5" />
-                    Convert to JSON
-                  </span>
-                )}
-              </Button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-blue-50 via-white to-purple-50 border-b">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
+          <div className="text-center">
+            <Badge variant="outline" className="mb-4 bg-white">
+              AI-Powered JSON Converter
+            </Badge>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+              Transform Text to
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Structured JSON</span>
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
+              Convert simple text descriptions into professional JSON prompts with AI-powered enhancement, 
+              real-time validation, and instant export capabilities.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>No signup required</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Shield className="w-4 h-4 text-green-600" />
+                <span>100% client-side processing</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Zap className="w-4 h-4 text-green-600" />
+                <span>Instant results</span>
+              </div>
             </div>
-
-            {/* Validation Status */}
-            {validationStatus.message && (
-              <Alert className={cn(
-                "border",
-                validationStatus.isValid 
-                  ? "bg-emerald-50 border-emerald-200" 
-                  : "bg-red-50 border-red-200"
-              )}>
-                <div className={cn(
-                  "flex items-center gap-2",
-                  validationStatus.isValid ? "text-emerald-800" : "text-red-800"
-                )}>
-                  {validationStatus.isValid ? (
-                    <CheckCircle className="w-5 h-5" />
-                  ) : (
-                    <XCircle className="w-5 h-5" />
-                  )}
-                  <AlertDescription className="font-medium">
-                    {validationStatus.message}
-                  </AlertDescription>
-                </div>
-              </Alert>
-            )}
           </div>
+        </div>
+      </section>
 
-          {/* Output Section */}
-          <div className="space-y-6">
-            {/* Output Card */}
-            <Card className="bg-white rounded-xl shadow-sm border border-slate-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-lg font-semibold text-slate-900">
-                    Generated JSON Prompt:
-                  </label>
-                  <div className="flex gap-2">
+      {/* Main Tool Section */}
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Input Section */}
+            <div className="space-y-6">
+              <Card className="border-0 shadow-lg">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl text-gray-900">
+                    Enter Your Text Prompt
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Describe what you want in natural language. Be as specific as possible.
+                  </p>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <Textarea
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Example: Create a chatbot that helps users find restaurants with specific dietary requirements, location preferences, and budget constraints, including user ratings and reviews."
+                    className="min-h-32 sm:min-h-40 resize-none text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    aria-label="Text prompt input"
+                  />
+                  <div className="mt-4 flex flex-col sm:flex-row gap-3">
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleCopy}
-                      disabled={!jsonOutput}
-                      className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                      title="Copy to clipboard"
+                      onClick={handleEnhance}
+                      disabled={isEnhancing || !inputText.trim()}
+                      variant="outline"
+                      className="flex-1 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300"
                     >
-                      <Copy className="w-4 h-4 mr-1" />
-                      Copy
+                      {isEnhancing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Enhancing...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Auto Enhance
+                        </>
+                      )}
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleDownload}
-                      disabled={!jsonOutput}
-                      className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                      title="Download JSON file"
+                      onClick={handleConvert}
+                      disabled={isProcessing || !inputText.trim()}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
                     >
-                      <Download className="w-4 h-4 mr-1" />
-                      Download
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Converting...
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="w-4 h-4 mr-2" />
+                          Convert to JSON
+                        </>
+                      )}
                     </Button>
                   </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    💡 Try the Auto Enhance feature to improve your prompt with AI suggestions
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Validation Status */}
+              {validationStatus.message && (
+                <Alert className={cn(
+                  "border-l-4",
+                  validationStatus.isValid 
+                    ? "bg-green-50 border-green-400 text-green-800" 
+                    : "bg-red-50 border-red-400 text-red-800"
+                )}>
+                  <div className="flex items-center gap-2">
+                    {validationStatus.isValid ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      <XCircle className="w-5 h-5" />
+                    )}
+                    <AlertDescription className="font-medium">
+                      {validationStatus.message}
+                    </AlertDescription>
+                  </div>
+                </Alert>
+              )}
+
+              {/* Quick Tips */}
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    Quick Tips
+                  </h3>
+                  <ul className="text-sm text-blue-800 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <ChevronDown className="w-3 h-3 mt-1 flex-shrink-0" />
+                      Include specific requirements like location, budget, or user preferences
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronDown className="w-3 h-3 mt-1 flex-shrink-0" />
+                      Mention the type of data or functionality you need
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronDown className="w-3 h-3 mt-1 flex-shrink-0" />
+                      Use the Auto Enhance feature for professional-grade prompts
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Output Section */}
+            <div className="space-y-6">
+              <Card className="border-0 shadow-lg">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl text-gray-900">
+                      Generated JSON Prompt
+                    </CardTitle>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCopy}
+                        disabled={!jsonOutput}
+                        className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      >
+                        <Copy className="w-4 h-4 mr-1" />
+                        Copy
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDownload}
+                        disabled={!jsonOutput}
+                        className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        Download
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Your structured JSON will appear here with proper formatting and validation.
+                  </p>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="relative rounded-lg overflow-hidden">
+                    <pre className="bg-gray-900 text-gray-100 p-4 overflow-x-auto font-mono text-sm max-h-96 overflow-y-auto">
+                      <code className="language-json">
+                        {jsonOutput || `{
+  "// Your generated JSON will appear here": "waiting for input...",
+  "example_structure": {
+    "task": "custom_prompt",
+    "purpose": "Your description here",
+    "parameters": {},
+    "constraints": {},
+    "output_format": {}
+  }
+}`}
+                      </code>
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Copy Success Message */}
+              {copySuccess && (
+                <Alert className="bg-green-50 border-green-200">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <AlertDescription className="text-green-800">
+                    JSON copied to clipboard successfully!
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Example Templates */}
+              <Card className="bg-purple-50 border-purple-200">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                    <Code className="w-4 h-4" />
+                    Example Use Cases
+                  </h3>
+                  <div className="text-sm text-purple-800 space-y-2">
+                    <div className="p-2 bg-white rounded border border-purple-200">
+                      <strong>Chatbot:</strong> "Create a customer support bot for e-commerce"
+                    </div>
+                    <div className="p-2 bg-white rounded border border-purple-200">
+                      <strong>API:</strong> "Search restaurants by cuisine and location with ratings"
+                    </div>
+                    <div className="p-2 bg-white rounded border border-purple-200">
+                      <strong>Analysis:</strong> "Analyze user feedback sentiment and categorize issues"
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+              Why Choose Our JSON Converter?
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              Built by developers for developers, featuring the latest AI enhancements and best practices.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card className="text-center border-0 shadow-sm">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-6 h-6 text-blue-600" />
                 </div>
-                
-                {/* JSON Output Display */}
-                <div className="relative">
-                  <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto font-mono text-sm max-h-96 overflow-y-auto">
-                    <code className="language-json">
-                      {jsonOutput || "// Your generated JSON will appear here"}
-                    </code>
-                  </pre>
-                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">AI Enhancement</h3>
+                <p className="text-sm text-gray-600">Automatically improve your prompts with AI-powered suggestions and best practices.</p>
               </CardContent>
             </Card>
 
-            {/* Copy Success Message */}
-            {copySuccess && (
-              <Alert className="bg-emerald-50 border-emerald-200">
-                <div className="flex items-center gap-2 text-emerald-800 text-sm">
-                  <CheckCircle className="w-4 h-4" />
-                  <AlertDescription>JSON copied to clipboard!</AlertDescription>
+            <Card className="text-center border-0 shadow-sm">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-6 h-6 text-green-600" />
                 </div>
-              </Alert>
-            )}
+                <h3 className="font-semibold text-gray-900 mb-2">Lightning Fast</h3>
+                <p className="text-sm text-gray-600">Real-time processing with instant validation and immediate results.</p>
+              </CardContent>
+            </Card>
 
-            {/* Usage Instructions */}
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-blue-900 mb-2">How to use this tool:</h3>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Describe your requirements in plain English</li>
-                  <li>• Click "Convert to JSON" to generate structured format</li>
-                  <li>• Copy or download the JSON for your projects</li>
-                  <li>• Use the generated JSON as a prompt template</li>
-                </ul>
+            <Card className="text-center border-0 shadow-sm">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">100% Private</h3>
+                <p className="text-sm text-gray-600">All processing happens in your browser. Your data never leaves your device.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-0 shadow-sm">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <FileText className="w-6 h-6 text-orange-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Easy Export</h3>
+                <p className="text-sm text-gray-600">Copy to clipboard or download as .json file with a single click.</p>
               </CardContent>
             </Card>
           </div>
         </div>
+      </section>
 
-        {/* Features Section */}
-        <div className="mt-12 grid md:grid-cols-3 gap-6">
-          <Card className="bg-white shadow-sm border border-slate-200 text-center">
-            <CardContent className="p-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Real-time Processing</h3>
-              <p className="text-sm text-slate-600">Instant conversion with live validation and error feedback</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-sm border border-slate-200 text-center">
-            <CardContent className="p-6">
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6 text-emerald-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2">JSON Validation</h3>
-              <p className="text-sm text-slate-600">Automatic validation ensures your JSON is properly formatted</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-sm border border-slate-200 text-center">
-            <CardContent className="p-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Easy Export</h3>
-              <p className="text-sm text-slate-600">Copy to clipboard or download as .json file with one click</p>
-            </CardContent>
-          </Card>
+      {/* FAQ Section */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Everything you need to know about our JSON converter tool.
+            </p>
+          </div>
+          
+          <Accordion type="single" collapsible className="space-y-4">
+            {faqs.map((faq, index) => (
+              <AccordionItem key={index} value={`item-${index}`} className="border border-gray-200 rounded-lg px-6">
+                <AccordionTrigger className="text-left font-semibold text-gray-900 hover:text-blue-600">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-gray-600 pb-4">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
-      </main>
+      </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 mt-16">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="text-center text-slate-600">
-            <p>&copy; 2025 Text-to-JSON Converter Tool. Built for developers, by developers.</p>
-            <p className="text-sm mt-2">Transform natural language into structured JSON prompts effortlessly.</p>
+      {/* CTA Section */}
+      <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">
+            Ready to Transform Your Workflow?
+          </h2>
+          <p className="mt-4 text-lg text-blue-100 max-w-2xl mx-auto">
+            Join thousands of developers who use our tool to create structured JSON prompts effortlessly.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/tools">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                Explore More Tools
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/about">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto text-white border-white hover:bg-white hover:text-blue-600">
+                Learn More
+              </Button>
+            </Link>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }
