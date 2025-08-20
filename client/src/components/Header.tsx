@@ -9,7 +9,7 @@ import {
   SheetDescription,
   SheetHeader,
 } from "@/components/ui/sheet";
-import { Menu, X, FileText } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -34,8 +34,9 @@ export default function Header() {
           {/* Logo */}
           <div className="flex lg:flex-1">
             <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
+              <div className="relative w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-xl blur-sm opacity-50"></div>
+                <Zap className="w-4 h-4 text-white relative z-10" />
               </div>
               <span className="font-bold text-xl text-gray-900 hidden sm:block">
                 JSON Converter
@@ -93,8 +94,9 @@ export default function Header() {
                 </SheetHeader>
                 <div className="flex items-center justify-between">
                   <Link href="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-white" />
+                    <div className="relative w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-xl blur-sm opacity-50"></div>
+                      <Zap className="w-4 h-4 text-white relative z-10" />
                     </div>
                     <span className="font-bold text-xl text-gray-900">
                       JSON Converter

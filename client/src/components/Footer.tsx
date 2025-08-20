@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { FileText, Github, Twitter, Linkedin } from "lucide-react";
+import { Zap, Github, Twitter, Linkedin } from "lucide-react";
 
 const navigation = {
   product: [
@@ -50,8 +50,9 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
+              <div className="relative w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-xl blur-sm opacity-50"></div>
+                <Zap className="w-4 h-4 text-white relative z-10" />
               </div>
               <span className="font-bold text-xl text-gray-900">
                 JSON Converter
