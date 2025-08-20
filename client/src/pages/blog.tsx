@@ -1,10 +1,17 @@
+import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, ArrowRight } from "lucide-react";
+import SearchBar from "@/components/SearchBar";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import AnimatedHeading from "@/components/AnimatedHeading";
+import { motion } from "framer-motion";
+import { Calendar, Clock, User, ArrowRight, Filter } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Blog() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const featuredPost = {
     title: "The Future of JSON: How AI is Transforming Data Structure Creation",
     excerpt: "Explore how artificial intelligence is revolutionizing the way developers work with JSON and structured data formats.",
@@ -81,22 +88,67 @@ export default function Blog() {
 
   const categories = ["All", "Technology", "Tutorial", "Guide", "API Design", "Tools", "Performance", "Product"];
 
+  // Filter posts based on search query and category
+  const filteredPosts = useMemo(() => {
+    return posts.filter(post => {
+      const matchesSearch = searchQuery === "" || 
+        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.author.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleCategoryFilter = (category: string) => {
+    setSelectedCategory(category);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <section className="bg-white border-b">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <Breadcrumbs />
           <div className="text-center">
             <Badge variant="outline" className="mb-4">
               Developer Blog
             </Badge>
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <AnimatedHeading 
+              variant="h1" 
+              className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl"
+            >
               Insights & Tutorials
-            </h1>
-            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+            </AnimatedHeading>
+            <motion.p 
+              className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
               Stay updated with the latest trends in JSON, API design, and developer tools. 
               Learn from our team's experience building tools for the developer community.
-            </p>
+            </motion.p>
+            
+            {/* Search Bar */}
+            <motion.div 
+              className="mt-8 flex justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <SearchBar 
+                onSearch={handleSearch}
+                placeholder="Search articles, authors, or topics..."
+                initialValue={searchQuery}
+              />
+            </motion.div>
           </div>
         </div>
       </section>
@@ -159,13 +211,25 @@ export default function Blog() {
       {/* Category Filter */}
       <section className="py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Filter by category:</span>
+            </div>
+            {(searchQuery || selectedCategory !== "All") && (
+              <span className="text-sm text-gray-600">
+                {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''} found
+              </span>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2 justify-center">
             {categories.map((category) => (
               <Button
                 key={category}
-                variant={category === "All" ? "default" : "outline"}
+                variant={category === selectedCategory ? "default" : "outline"}
                 size="sm"
-                className={category === "All" ? "bg-blue-600 hover:bg-blue-700" : ""}
+                className={category === selectedCategory ? "bg-blue-600 hover:bg-blue-700" : ""}
+                onClick={() => handleCategoryFilter(category)}
               >
                 {category}
               </Button>
@@ -177,54 +241,76 @@ export default function Blog() {
       {/* Blog Posts Grid */}
       <section className="pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => (
-              <Card key={post.href} className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow">
-                <div className="relative h-48">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-3">
-                    <Badge variant="outline" className="text-xs">
-                      {post.category}
-                    </Badge>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(post.date).toLocaleDateString()}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {post.readTime}
-                      </div>
+          {filteredPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-gray-600 mb-4">No articles found matching your search criteria.</p>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("All");
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPosts.map((post, index) => (
+                <motion.div
+                  key={post.href}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-shadow h-full">
+                    <div className="relative h-48">
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
                     </div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <User className="w-3 h-3 text-gray-400" />
-                      <span className="text-xs text-gray-600">{post.author}</span>
-                    </div>
-                    <Link href={post.href}>
-                      <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                        Read More
-                        <ArrowRight className="w-3 h-3 ml-1" />
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    <CardContent className="p-6 flex flex-col h-full">
+                      <div className="flex items-center gap-4 mb-3">
+                        <Badge variant="outline" className="text-xs">
+                          {post.category}
+                        </Badge>
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(post.date).toLocaleDateString()}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {post.readTime}
+                          </div>
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 flex-grow">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
+                        {post.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <div className="flex items-center gap-2">
+                          <User className="w-3 h-3 text-gray-400" />
+                          <span className="text-xs text-gray-600">{post.author}</span>
+                        </div>
+                        <Link href={post.href}>
+                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                            Read More
+                            <ArrowRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

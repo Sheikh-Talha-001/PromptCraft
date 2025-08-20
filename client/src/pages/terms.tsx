@@ -1,137 +1,303 @@
-import { ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import AnimatedHeading from "@/components/AnimatedHeading";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
 
 export default function Terms() {
+  const sections = [
+    {
+      title: "Agreement to Terms",
+      content: {
+        description: "By accessing or using JSON Converter ('the Service'), you agree to be bound by these Terms of Service ('Terms'). If you disagree with any part of these terms, then you may not access the Service. These Terms apply to all visitors, users, and others who access or use the Service.",
+        keyPoints: [
+          "These Terms constitute a legally binding agreement",
+          "By using our Service, you accept all terms and conditions",
+          "You must be at least 13 years old to use our Service",
+          "Business users must have authority to bind their organization"
+        ]
+      }
+    },
+    {
+      title: "Description of Service",
+      content: {
+        description: "JSON Converter is a web-based tool that converts natural language text descriptions into structured JSON format using AI-powered processing.",
+        subsections: [
+          {
+            subtitle: "Core Features",
+            list: [
+              "Text-to-JSON conversion with AI enhancement",
+              "Real-time validation and error checking",
+              "Multiple output formats and customization options",
+              "Blog content and educational resources",
+              "Customer support and documentation"
+            ]
+          },
+          {
+            subtitle: "Service Availability",
+            list: [
+              "Service is provided 'as available' without uptime guarantees",
+              "We may modify, suspend, or discontinue any part of the Service",
+              "Scheduled maintenance may temporarily affect availability",
+              "Emergency maintenance may occur without prior notice"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      title: "User Accounts and Registration",
+      content: {
+        subsections: [
+          {
+            subtitle: "Account Creation",
+            list: [
+              "You may create an account to access enhanced features",
+              "You must provide accurate and complete information",
+              "You are responsible for maintaining account security",
+              "You must notify us immediately of any unauthorized access"
+            ]
+          },
+          {
+            subtitle: "Account Responsibilities",
+            list: [
+              "Keep your password secure and confidential",
+              "You are liable for all activities under your account",
+              "Do not share your account credentials with others",
+              "Update your information when it changes"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      title: "Acceptable Use Policy",
+      content: {
+        description: "You agree to use our Service responsibly and in compliance with all applicable laws and regulations.",
+        subsections: [
+          {
+            subtitle: "Permitted Uses",
+            list: [
+              "Personal and commercial JSON conversion projects",
+              "Educational and research purposes",
+              "Integration with your own applications (subject to API terms)",
+              "Sharing generated JSON output (you retain ownership)"
+            ]
+          },
+          {
+            subtitle: "Prohibited Activities",
+            list: [
+              "Illegal activities or content that violates laws",
+              "Malicious code, viruses, or harmful content",
+              "Automated scraping or data harvesting",
+              "Attempting to breach security or access controls",
+              "Reverse engineering or copying our technology",
+              "Spamming, harassment, or abusive behavior",
+              "Impersonating others or providing false information"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      title: "Intellectual Property Rights",
+      content: {
+        subsections: [
+          {
+            subtitle: "Our Rights",
+            description: "JSON Converter and all related technology, content, and materials are owned by us or our licensors.",
+            list: [
+              "The Service name, logo, and branding are our trademarks",
+              "All software, algorithms, and technology are proprietary",
+              "Content, design, and user interface are protected by copyright",
+              "You may not copy, modify, or distribute our intellectual property"
+            ]
+          },
+          {
+            subtitle: "Your Rights",
+            description: "You retain ownership of content you create and input into our Service.",
+            list: [
+              "You own the text you input for conversion",
+              "You own the JSON output generated from your input",
+              "You may use, modify, and distribute your generated content",
+              "You grant us permission to process your input to provide the Service"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      title: "Privacy and Data Protection",
+      content: {
+        description: "Your privacy is important to us. Please review our Privacy Policy to understand how we collect, use, and protect your information.",
+        keyPoints: [
+          "Most processing happens locally in your browser",
+          "We don't permanently store your conversion data",
+          "We collect minimal information necessary for service operation",
+          "We comply with GDPR, CCPA, and other privacy regulations",
+          "You can control your privacy settings and data"
+        ]
+      }
+    },
+    {
+      title: "Disclaimers and Limitations",
+      content: {
+        subsections: [
+          {
+            subtitle: "Service Disclaimer",
+            list: [
+              "The Service is provided 'as is' without warranties of any kind",
+              "We don't guarantee accuracy of AI-generated JSON output",
+              "You should review and validate all generated content",
+              "We disclaim all express and implied warranties"
+            ]
+          },
+          {
+            subtitle: "Limitation of Liability",
+            list: [
+              "We are not liable for any indirect or consequential damages",
+              "Our liability is limited to the amount you paid for the Service",
+              "We are not responsible for third-party content or services",
+              "You use the Service at your own risk"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      title: "Termination",
+      content: {
+        subsections: [
+          {
+            subtitle: "Termination by You",
+            list: [
+              "You may stop using the Service at any time",
+              "You may delete your account through your account settings",
+              "Termination does not affect your rights to content you created"
+            ]
+          },
+          {
+            subtitle: "Termination by Us",
+            list: [
+              "We may terminate accounts for Terms violations",
+              "We may suspend Service for maintenance or legal reasons",
+              "We will provide reasonable notice when possible",
+              "Upon termination, your access to the Service ends immediately"
+            ]
+          }
+        ]
+      }
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <Button variant="ghost" className="flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Home
-              </Button>
-            </Link>
-          </div>
+    <div className="min-h-screen bg-gray-50 py-16">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <Breadcrumbs />
+        <div className="text-center mb-12">
+          <Badge variant="outline" className="mb-4">
+            Terms of Service
+          </Badge>
+          <AnimatedHeading 
+            variant="h1" 
+            className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl"
+          >
+            Terms of Service
+          </AnimatedHeading>
+          <motion.p 
+            className="mt-4 text-lg text-gray-600"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            Last updated: January 20, 2025
+          </motion.p>
+          <motion.p 
+            className="mt-2 text-sm text-gray-500 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            These Terms of Service govern your use of JSON Converter and constitute a legal agreement between you and us. Please read these terms carefully before using our Service.
+          </motion.p>
+        </div>
+
+        <div className="space-y-8">
+          {sections.map((section, sectionIndex) => (
+            <motion.div
+              key={section.title}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: sectionIndex * 0.1 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl text-gray-900">{section.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {section.content.description && (
+                    <p className="text-gray-700 leading-relaxed">{section.content.description}</p>
+                  )}
+                  
+                  {section.content.keyPoints && (
+                    <ul className="space-y-2 ml-4">
+                      {section.content.keyPoints.map((point, index) => (
+                        <li key={index} className="text-gray-600 flex items-start">
+                          <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {section.content.subsections?.map((subsection, index) => (
+                    <div key={index} className="space-y-3">
+                      <h4 className="font-semibold text-gray-900">{subsection.subtitle}</h4>
+                      {'description' in subsection && subsection.description && (
+                        <p className="text-gray-700 leading-relaxed">{subsection.description}</p>
+                      )}
+                      {subsection.list && (
+                        <ul className="space-y-2 ml-4">
+                          {subsection.list.map((item, itemIndex) => (
+                            <li key={itemIndex} className="text-gray-600 flex items-start">
+                              <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+
+          {/* Contact Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          >
+            <Card className="bg-blue-600 text-white">
+              <CardHeader>
+                <CardTitle className="text-xl">Questions About These Terms?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-blue-100 mb-4">
+                  If you have any questions about these Terms of Service or need clarification about your rights and responsibilities, please don't hesitate to contact us.
+                </p>
+                <div className="space-y-2">
+                  <p><strong>Email:</strong> legal@jsonconverter.com</p>
+                  <p><strong>Support:</strong> <Link href="/help" className="text-blue-200 hover:text-white underline">Visit our Help Center</Link></p>
+                  <p><strong>Contact:</strong> <Link href="/contact" className="text-blue-200 hover:text-white underline">Get in Touch</Link></p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </div>
-
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm border p-8 md:p-12">
-          <div className="prose max-w-none">
-            <h1 className="text-4xl font-bold text-gray-900 mb-8">Terms of Service</h1>
-            <p className="text-gray-600 mb-8">Last updated: January 2025</p>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Agreement to Terms</h2>
-              <p className="text-gray-700 mb-4">
-                By accessing and using our Text-to-JSON Prompt Converter service, you accept and agree to be bound by the terms and provision of this agreement.
-              </p>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Use License</h2>
-              <p className="text-gray-700 mb-4">
-                Permission is granted to temporarily use our service for personal and commercial purposes under the following conditions:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>This is the grant of a license, not a transfer of title</li>
-                <li>Under this license you may not modify or copy the service</li>
-                <li>You may not use the service for any commercial purpose without explicit permission</li>
-                <li>You may not attempt to reverse engineer any software contained on our service</li>
-                <li>You may not remove any copyright or other proprietary notations</li>
-              </ul>
-              <p className="text-gray-700 mt-4">
-                This license shall automatically terminate if you violate any of these restrictions and may be terminated by us at any time.
-              </p>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Acceptable Use</h2>
-              <p className="text-gray-700 mb-4">
-                You agree to use our service responsibly and in accordance with these guidelines:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>Do not use the service for illegal or unauthorized purposes</li>
-                <li>Do not input malicious code or content that could harm other users</li>
-                <li>Do not attempt to overwhelm our servers with excessive requests</li>
-                <li>Do not use automated tools to scrape or harvest data from our service</li>
-                <li>Respect intellectual property rights of others</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Service Availability</h2>
-              <p className="text-gray-700 mb-4">
-                We strive to provide reliable service, but please note:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>Service availability is not guaranteed and may be interrupted</li>
-                <li>We may modify or discontinue the service at any time</li>
-                <li>Maintenance may temporarily affect service availability</li>
-                <li>We are not liable for any downtime or service interruptions</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Privacy and Data</h2>
-              <p className="text-gray-700 mb-4">
-                Your privacy is important to us:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>All text processing happens locally in your browser</li>
-                <li>We do not permanently store your input text or generated JSON</li>
-                <li>Please review our <Link href="/privacy" className="text-blue-600 hover:text-blue-800">Privacy Policy</Link> for detailed information</li>
-                <li>You are responsible for the content you input into our service</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Disclaimer</h2>
-              <p className="text-gray-700 mb-4">
-                The information on this service is provided on an "as is" basis:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>We make no representations or warranties of any kind</li>
-                <li>Generated JSON output may not be perfect and should be reviewed</li>
-                <li>You use this service at your own risk</li>
-                <li>We are not responsible for any decisions made based on generated output</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Limitations</h2>
-              <p className="text-gray-700 mb-4">
-                In no event shall our company or its suppliers be liable for any damages:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>Loss of data or profits arising out of the use of our service</li>
-                <li>Interruption of business or any other commercial damages</li>
-                <li>Damages resulting from the use or inability to use our service</li>
-                <li>Even if we have been advised of the possibility of such damages</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Governing Law</h2>
-              <p className="text-gray-700">
-                These terms and conditions are governed by and construed in accordance with applicable laws, and you irrevocably submit to the exclusive jurisdiction of the courts in that state or location.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Contact Information</h2>
-              <p className="text-gray-700">
-                If you have any questions about these Terms of Service, please contact us at our <Link href="/contact" className="text-blue-600 hover:text-blue-800">Contact page</Link> or email us at legal@jsonconverter.com.
-              </p>
-            </section>
-          </div>
-        </div>
-      </main>
     </div>
   );
 }
