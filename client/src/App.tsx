@@ -13,6 +13,8 @@ import Tools from "@/pages/tools";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import Contact from "@/pages/contact";
+import Lenis from "@studio-freight/lenis";
+import { useEffect } from "react";
 
 function Router() {
   return (
@@ -30,6 +32,18 @@ function Router() {
 }
 
 function App() {
+  useEffect(() =>{
+    // Initialize Lenis
+    const lenis = new Lenis({
+      autoRaf: true,
+    });
+
+    // Listen for the scroll event and log the event data
+    lenis.on('scroll', (e) => {
+      console.log(e);
+    });
+    
+  });
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
