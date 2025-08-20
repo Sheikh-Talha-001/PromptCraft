@@ -13,7 +13,7 @@ import Tools from "@/pages/tools";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import Contact from "@/pages/contact";
-import Lenis from "@studio-freight/lenis";
+import Lenis from "lenis";
 import { useEffect } from "react";
 
 function Router() {
@@ -39,7 +39,7 @@ function App() {
     });
 
     // Listen for the scroll event and log the event data
-    lenis.on('scroll', (e) => {
+    lenis.on('scroll', (e: any) => {
       console.log(e);
     });
     
