@@ -6,6 +6,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+import AnimatedHeading from "@/components/AnimatedHeading";
+import { motion } from "framer-motion";
 import { 
   RotateCcw, 
   Copy, 
@@ -415,28 +417,53 @@ export default function Home() {
             <Badge variant="outline" className="mb-4 bg-white">
               AI-Powered JSON Converter
             </Badge>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            <AnimatedHeading 
+              variant="h1" 
+              className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl"
+            >
               Transform Text to
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Structured JSON</span>
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
+            </AnimatedHeading>
+            <motion.p 
+              className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
               Convert simple text descriptions into professional JSON prompts with AI-powered enhancement, 
               real-time validation, and instant export capabilities.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+            </motion.p>
+            <motion.div 
+              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <motion.div 
+                className="flex items-center gap-2 text-sm text-gray-600"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <span>No signup required</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-2 text-sm text-gray-600"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
                 <Shield className="w-4 h-4 text-green-600" />
                 <span>100% client-side processing</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-2 text-sm text-gray-600"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
                 <Zap className="w-4 h-4 text-green-600" />
                 <span>Instant results</span>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -447,15 +474,29 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Input Section */}
             <div className="space-y-6">
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-xl text-gray-900">
-                    Enter Your Text Prompt
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Describe what you want in natural language. Be as specific as possible.
-                  </p>
-                </CardHeader>
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <Card className="border-0 shadow-lg">
+                  <CardHeader className="pb-4">
+                    <AnimatedHeading 
+                      variant="h2" 
+                      className="text-xl text-gray-900"
+                      delay={0.4}
+                    >
+                      Enter Your Text Prompt
+                    </AnimatedHeading>
+                    <motion.p 
+                      className="text-sm text-gray-600"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.6 }}
+                    >
+                      Describe what you want in natural language. Be as specific as possible.
+                    </motion.p>
+                  </CardHeader>
                 <CardContent className="pt-0">
                   <Textarea
                     value={inputText}
@@ -505,7 +546,8 @@ export default function Home() {
                     💡 Try the Auto Enhance feature to improve your prompt with AI suggestions
                   </p>
                 </CardContent>
-              </Card>
+                </Card>
+              </motion.div>
 
               {/* Validation Status */}
               {validationStatus.message && (
@@ -555,12 +597,21 @@ export default function Home() {
 
             {/* Output Section */}
             <div className="space-y-6">
-              <Card className="border-0 shadow-lg">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl text-gray-900">
-                      Generated JSON Prompt
-                    </CardTitle>
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <Card className="border-0 shadow-lg">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <AnimatedHeading 
+                        variant="h2" 
+                        className="text-xl text-gray-900"
+                        delay={0.6}
+                      >
+                        Generated JSON Prompt
+                      </AnimatedHeading>
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
@@ -584,9 +635,14 @@ export default function Home() {
                       </Button>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <motion.p 
+                    className="text-sm text-gray-600"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                  >
                     Your structured JSON will appear here with proper formatting and validation.
-                  </p>
+                  </motion.p>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <div className="relative rounded-lg overflow-hidden">
@@ -607,6 +663,7 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
+              </motion.div>
 
               {/* Copy Success Message */}
               {copySuccess && (
@@ -647,24 +704,45 @@ export default function Home() {
       <section className="bg-white py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            <AnimatedHeading 
+              variant="h2" 
+              className="text-3xl font-bold text-gray-900 sm:text-4xl"
+            >
               Why Choose Our JSON Converter?
-            </h2>
-            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+            </AnimatedHeading>
+            <motion.p 
+              className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               Built by developers for developers, featuring the latest AI enhancements and best practices.
-            </p>
+            </motion.p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="text-center border-0 shadow-sm">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">AI Enhancement</h3>
-                <p className="text-sm text-gray-600">Automatically improve your prompts with AI-powered suggestions and best practices.</p>
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              whileHover={{ y: -5 }}
+            >
+              <Card className="text-center border-0 shadow-sm h-full">
+                <CardContent className="p-6">
+                  <motion.div 
+                    className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Sparkles className="w-6 h-6 text-blue-600" />
+                  </motion.div>
+                  <h3 className="font-semibold text-gray-900 mb-2">AI Enhancement</h3>
+                  <p className="text-sm text-gray-600">Automatically improve your prompts with AI-powered suggestions and best practices.</p>
+                </CardContent>
+              </Card>
+            </motion.div>
 
             <Card className="text-center border-0 shadow-sm">
               <CardContent className="p-6">
